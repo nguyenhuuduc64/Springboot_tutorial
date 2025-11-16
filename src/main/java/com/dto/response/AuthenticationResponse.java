@@ -1,4 +1,4 @@
-package com.dto.request;
+package com.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE) // cac field khong co type thi se mac dinh la private
-public class UserUpdateRequest {
-    String password;
-    String fullName;
+public class AuthenticationResponse {
+    boolean isAuthenticated;
+
 }
