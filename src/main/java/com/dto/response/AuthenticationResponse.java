@@ -12,6 +12,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE) // cac field khong co type thi se mac dinh la private
 public class AuthenticationResponse {
+    String token;
     boolean isAuthenticated;
-
 }
+
+

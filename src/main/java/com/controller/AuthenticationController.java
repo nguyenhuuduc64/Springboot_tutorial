@@ -3,7 +3,9 @@ package com.controller;
 
 import com.dto.request.ApiResponse;
 import com.dto.request.AuthenticationRequest;
+import com.dto.request.IntrospectRequest;
 import com.dto.response.AuthenticationResponse;
+import com.dto.response.IntrospectResponse;
 import com.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,12 +23,22 @@ public class AuthenticationController {
 
     @PostMapping("/log-in")
     ApiResponse <AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest authenticationRequest){
-        boolean result = authenticationService.authenticate(authenticationRequest);
+        AuthenticationResponse result = authenticationService.authenticate(authenticationRequest);
 
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(AuthenticationResponse.builder()
-                        .isAuthenticated(result)
+                        .isAuthenticated(result.isAuthenticated())
+                        .token(result.getToken())
                         .build())
+                .build();
+    }
+
+    @PostMapping("/introspect")
+    ApiResponse <IntrospectResponse> authenticate(@RequestBody IntrospectRequest introspectRequest){
+        IntrospectResponse result = authenticationService.introspect(introspectRequest);
+
+        return ApiResponse.<IntrospectResponse>builder()
+                .result(result)
                 .build();
     }
 }

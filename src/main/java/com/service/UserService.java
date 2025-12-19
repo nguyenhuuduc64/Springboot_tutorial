@@ -19,6 +19,7 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor // bien nao co defind la final thi se duoc inject vao class
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true) // cac field khong co type thi se mac dinh la
                                                                      // private va dua vao contructor nhu final
+
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -29,8 +30,6 @@ public class UserService {
             throw new RuntimeException("User existed");
 
         User user = userMapper.toUser(request);
-        System.out.println(user);
-        System.out.println("password after save" + user.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
