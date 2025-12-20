@@ -8,6 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import jakarta.persistence.GenerationType;
+
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Data
 @Builder
@@ -21,6 +25,5 @@ public class User {
     String username;
     String password;
     String fullName;
-    
-
+    Set<String> roles; //trong 1 mang role chi co 1 role la duy nhat, khong bi trung
 }

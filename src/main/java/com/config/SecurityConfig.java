@@ -43,10 +43,9 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(request ->
             request
                     .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                    .requestMatchers(HttpMethod.GET, "/users/**").hasAnyAuthority("SCOPE_ADMIN")
                     .anyRequest().authenticated()
         );
-
-
         httpSecurity.oauth2ResourceServer(request ->
             request
                     .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,5 +21,7 @@ public class UserCreationRequest {
     @Size(min = 8, message = "password must be at least 8 characters")
     String password;
     String fullName;
+
+    Set<String> roles;
     
 }

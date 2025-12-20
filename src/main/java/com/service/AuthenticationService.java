@@ -4,6 +4,7 @@ import com.dto.request.AuthenticationRequest;
 import com.dto.request.IntrospectRequest;
 import com.dto.response.AuthenticationResponse;
 import com.dto.response.IntrospectResponse;
+import com.entity.User;
 import com.exception.AppException;
 import com.exception.ErrorCode;
 import com.nimbusds.jose.*;
@@ -18,9 +19,11 @@ import lombok.experimental.NonFinal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
@@ -41,7 +44,7 @@ public class AuthenticationService {
         if (!authenticated) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
-        String token = this.generateToken(user.getUsername());
+        String token = this.generateToken(user);
         boolean isAuthenticated = true;
         return new AuthenticationResponse(token, isAuthenticated);
     }
@@ -70,17 +73,19 @@ public class AuthenticationService {
         }
     }
 
-    private String generateToken (String username){
+    private String generateToken (User user){
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         
         //các thành phần trong 1 jwt
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
-                .issuer(username)
+                .subject(user.getUsername())
+                .issuer(user.getUsername())
                 .issueTime(new Date())
+                .claim("scope", buildScope(user))
                 .expirationTime(new Date(
                         new Date().getTime() + 3600 * 1000
                 ))
+
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -92,5 +97,16 @@ public class AuthenticationService {
         } catch (JOSEException e){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
+    }
+
+    private String buildScope(User user){
+        StringJoiner scopes =  new StringJoiner(" ");
+
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(scopes::add);
+        }
+
+        return scopes.toString();
+
     }
 }

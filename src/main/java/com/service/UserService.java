@@ -1,7 +1,9 @@
 package com.service;
 
+import java.util.HashSet;
 import java.util.List;
 
+import com.enums.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +27,21 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public User createUser(UserCreationRequest request) {
+    public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByUsername(request.getUsername()))
             throw new RuntimeException("User existed");
 
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+
+        HashSet<String> roles = new HashSet<>();
+
+        roles.add(Role.USER.name());
+        user.setRoles(roles);
+        UserResponse userResponse = userMapper.toUserResponse(user);
+        userRepository.save(user);
+
+        return  userResponse;
     }
 
     /* khi dung Annotation builder ben request thi co the tao nhanh 1 request */

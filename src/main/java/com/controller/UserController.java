@@ -1,6 +1,9 @@
 package com.controller;
 
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +24,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -29,16 +33,22 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("")
-    ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request){
-        ApiResponse<User> apiResponse = new ApiResponse<>();
+    ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("success");
         apiResponse.setResult(userService.createUser(request));
         return apiResponse;
     }
 
     @GetMapping("")
-    List<User> getUsers(){
-        return userService.getUsers();
+    ApiResponse<Object> getUsers(){
+        //lay thong tin hien tai cua user dang dang nhap
+        log.info("getUsers");
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        authentication.getAuthorities().forEach(authority -> log.info("role: {}", authority));
+        return ApiResponse.builder()
+                .result(userService.getUsers())
+                .build();
     }
 
     @GetMapping("/{userId}")
