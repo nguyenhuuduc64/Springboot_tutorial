@@ -42,12 +42,15 @@ public class UserController {
 
     @GetMapping("")
     ApiResponse<Object> getUsers(){
-        //lay thong tin hien tai cua user dang dang nhap
-        log.info("getUsers");
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        authentication.getAuthorities().forEach(authority -> log.info("role: {}", authority));
         return ApiResponse.builder()
                 .result(userService.getUsers())
+                .build();
+    }
+
+    @GetMapping("/my-info")
+    ApiResponse<Object> getMyInfo(){
+        return ApiResponse.builder()
+                .result(userService.getMyInfo())
                 .build();
     }
 

@@ -2,8 +2,15 @@ package com.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import com.enums.Role;
+import com.exception.AppException;
+import com.exception.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +24,7 @@ import com.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor // bien nao co defind la final thi se duoc inject vao class
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true) // cac field khong co type thi se mac dinh la
@@ -50,8 +58,24 @@ public class UserService {
     // .fullName("name")
     // .build();
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public UserResponse getMyInfo() {
+        //SecurityContextHolder luu thong tin dang nhap cua user sau khi login
+        var context = SecurityContextHolder.getContext();
+        //lay username tu info cua nguoi dung dang dang nhap hien tai
+        String name = context.getAuthentication().getName();
+
+        User byUsername = userRepository.findByUsername(name)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        return  userMapper.toUserResponse(byUsername);
+    }
+
+    //kiểm tra trước khi method được thực hiện
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
+    public List<UserResponse> getUsers() {
+        log.info("getUsers is called");
+        return userRepository.findAll().stream()
+                .map(userMapper::toUserResponse).toList();
     }
 
     // tra ve User Entity cua DB
@@ -60,6 +84,8 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    //thực hiện method trước khi kiểm tra
+    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUserById(String id) {
         User user = getUserEntityById(id);
         return userMapper.toUserResponse(user);
