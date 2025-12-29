@@ -3,10 +3,12 @@ package com.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-import com.enums.Role;
+import com.entity.Role;
 import com.exception.AppException;
 import com.exception.ErrorCode;
+import com.repository.RoleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +36,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-
+    private final RoleRepository  roleRepository;
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByUsername(request.getUsername()))
             throw new RuntimeException("User existed");
@@ -42,9 +44,12 @@ public class UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        HashSet<String> roles = new HashSet<>();
-
-        roles.add(Role.USER.name());
+        HashSet<Role> roles = new HashSet<>();
+        var role_user = Role.builder()
+                .name("USER")
+                .description("USER")
+                .build();
+        roles.add(role_user);
         user.setRoles(roles);
         UserResponse userResponse = userMapper.toUserResponse(user);
         userRepository.save(user);
@@ -71,6 +76,7 @@ public class UserService {
     }
 
     //kiểm tra trước khi method được thực hiện
+    //dung hasRole thi scope la ROLE_ADMIN con hasAuthority khi co SCOPE_ADMIN
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public List<UserResponse> getUsers() {
         log.info("getUsers is called");
@@ -85,6 +91,9 @@ public class UserService {
     }
 
     //thực hiện method trước khi kiểm tra
+    //dieu kien kiem tra chinh chu moi co the thuc hien
+    //returnObject la thong tin cua user lay tu Id
+    //uathenticate la thong tin cua nguoi dung nhap hien tai qua jwt
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUserById(String id) {
         User user = getUserEntityById(id);
@@ -94,6 +103,9 @@ public class UserService {
     public UserResponse updateUser(String id, UserUpdateRequest userUpdate) {
         User user = getUserEntityById(id);
         userMapper.updateUser(user, userUpdate);
+        List<Role> roles = roleRepository.findAllById(userUpdate.getRoles());
+        //do JPA tra ve List can converse sang Set cua User
+        user.setRoles(new  HashSet<>(roles));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 

@@ -1,13 +1,12 @@
 package com.entity;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -15,14 +14,8 @@ import java.util.Set;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE) //cac field khong co type thi se mac dinh la private
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Permission {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
-    String username;
-    String password;
-    String fullName;
-
-    @ManyToMany
-    Set<Role> roles; //trong 1 mang role chi co 1 role la duy nhat, khong bi trung
+    String name;
+    String description;
 }

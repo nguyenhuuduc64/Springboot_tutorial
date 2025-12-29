@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -14,4 +16,5 @@ import lombok.experimental.FieldDefaults;
 public class UserUpdateRequest {
     String password;
     String fullName;
+    Set<String> roles;
 }

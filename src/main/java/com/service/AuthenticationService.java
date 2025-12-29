@@ -103,7 +103,7 @@ public class AuthenticationService {
         StringJoiner scopes =  new StringJoiner(" ");
 
         if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(scopes::add);
+            user.getRoles().forEach(role -> scopes.add(role.getName()));
         }
 
         return scopes.toString();

@@ -3,6 +3,7 @@ package com.controller;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     private final UserService userService;
-
     @PostMapping("")
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
@@ -42,6 +42,7 @@ public class UserController {
 
     @GetMapping("")
     ApiResponse<Object> getUsers(){
+        log.info("get users");
         return ApiResponse.builder()
                 .result(userService.getUsers())
                 .build();

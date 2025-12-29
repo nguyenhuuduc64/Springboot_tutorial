@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINT = {
-            "/users/**",
+
             "/auth/token",
             "/auth/introspect",
             "/auth/log-in"
@@ -38,8 +38,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
-
 
         //cho pheps tất cả các end point /users đều truy cập được
         httpSecurity.authorizeHttpRequests(request ->

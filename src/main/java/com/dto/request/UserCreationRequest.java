@@ -1,5 +1,6 @@
 package com.dto.request;
 
+import com.enums.Role;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,6 @@ public class UserCreationRequest {
     String password;
     String fullName;
 
-    Set<String> roles;
+    Set<Role> roles;
     
 }
