@@ -1,5 +1,6 @@
 package com.config; // hoặc package phù hợp với dự án của bạn
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,8 @@ public class SecurityConfig {
 
             "/auth/token",
             "/auth/introspect",
-            "/auth/log-in"
+            "/auth/log-in",
+            "/auth/log-out"
     };
 
 
@@ -40,21 +42,32 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         //cho pheps tất cả các end point /users đều truy cập được
-        httpSecurity.authorizeHttpRequests(request ->
-            request
-                    //tat ca endpoint nam trong public voi method POST thi public
-                    .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
-                    //.requestMatchers(HttpMethod.GET, "/users/**").hasAnyAuthority("SCOPE_ADMIN")
-                    .anyRequest().authenticated()
-        );
-        httpSecurity.oauth2ResourceServer(request ->
-            request
-                    .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
-        );
+        httpSecurity
+                .authorizeHttpRequests(request ->
+                    request
+                            //tat ca endpoint nam trong public voi method POST thi public
+                            .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                            //.requestMatchers(HttpMethod.GET, "/users/**").hasAnyAuthority("SCOPE_ADMIN")
+                            .anyRequest().authenticated()
+                    )
+                .oauth2ResourceServer(request ->
+                    request
+                            .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+                    );
+                //xu ly logout
+                /*.logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        }
+                )*/
+
         //tắt cross origin
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
+
+
 
     @Bean
     JwtDecoder jwtDecoder() {

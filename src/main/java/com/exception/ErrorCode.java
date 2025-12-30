@@ -36,7 +36,10 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(5000, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
     DATABASE_ERROR(5001, "Database error", HttpStatus.INTERNAL_SERVER_ERROR),
     EXTERNAL_SERVICE_ERROR(5002, "External service error", HttpStatus.INTERNAL_SERVER_ERROR),
-    FILE_UPLOAD_ERROR(5003, "File upload failed", HttpStatus.INTERNAL_SERVER_ERROR);
+    FILE_UPLOAD_ERROR(5003, "File upload failed", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    //tokens
+    INVALID_TOKEN(5004,"token id expired",HttpStatus.UNAUTHORIZED );
 
     private final int code;
     private final String message;

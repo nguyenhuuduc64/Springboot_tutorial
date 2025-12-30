@@ -4,8 +4,10 @@ package com.controller;
 import com.dto.request.ApiResponse;
 import com.dto.request.AuthenticationRequest;
 import com.dto.request.IntrospectRequest;
+import com.dto.request.LogoutRequest;
 import com.dto.response.AuthenticationResponse;
 import com.dto.response.IntrospectResponse;
+import com.nimbusds.jose.JOSEException;
 import com.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.ParseException;
 
 @Slf4j
 @RestController
@@ -38,7 +42,10 @@ public class AuthenticationController {
                         .build())
                 .build();
     }
-
+    @PostMapping("/log-out")
+    ApiResponse<Object> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        return authenticationService.logout(request);
+    }
     @PostMapping("/introspect")
     ApiResponse <IntrospectResponse> authenticate(@RequestBody IntrospectRequest introspectRequest){
         IntrospectResponse result = authenticationService.introspect(introspectRequest);
