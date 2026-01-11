@@ -19,10 +19,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ApplicationInitConfig {
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Bean
-    public ApplicationRunner applicationRunner(UserRepository userRepository){
+    public ApplicationRunner applicationRunner(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()){
                 Role adminRole = roleRepository.findById("admin")

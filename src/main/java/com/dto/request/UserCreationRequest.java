@@ -23,6 +23,7 @@ public class UserCreationRequest {
     String password;
     String fullName;
 
-    Set<Role> roles;
+    String email;
+    Set<String> roles;
     
 }

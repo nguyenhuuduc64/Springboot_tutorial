@@ -2,6 +2,7 @@ package com.controller;
 
 import java.util.List;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,7 +65,6 @@ public class UserController {
     UserResponse updateUser(@RequestBody UserUpdateRequest userUpdate, @PathVariable("userId") String userId){
         return userService.updateUser(userId, userUpdate);
     }
-
     @DeleteMapping("/{userId}")
     String  deleteUser(@PathVariable("userId") String userId){
         userService.deleteUser(userId); 

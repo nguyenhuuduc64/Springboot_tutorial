@@ -9,6 +9,7 @@ import com.entity.Role;
 import com.exception.AppException;
 import com.exception.ErrorCode;
 import com.repository.RoleRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,11 +46,9 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         HashSet<Role> roles = new HashSet<>();
-        var role_user = Role.builder()
-                .name("USER")
-                .description("USER")
-                .build();
-        roles.add(role_user);
+        roleRepository.findById("user").ifPresent(roles::add);
+
+
         user.setRoles(roles);
         UserResponse userResponse = userMapper.toUserResponse(user);
         userRepository.save(user);
@@ -108,7 +107,7 @@ public class UserService {
         user.setRoles(new  HashSet<>(roles));
         return userMapper.toUserResponse(userRepository.save(user));
     }
-
+    @Transactional
     public void deleteUser(String id) {
         userRepository.deleteById(id);
     }

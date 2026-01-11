@@ -1,48 +1,51 @@
 package com.config; // hoặc package phù hợp với dự án của bạn
 
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
-import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-
+    @Lazy
+    private final CustomJwtDecoder customJwtDecoder;
     private final String[] PUBLIC_ENDPOINT = {
 
             "/auth/token",
             "/auth/introspect",
             "/auth/log-in",
-            "/auth/log-out"
+            "/auth/log-out",
+            "/auth/refresh",
+            "/users",
+            "/auth/log-in/google",
+            "/ai/analyze-tech"
+
     };
 
-
-    @Value("${jwt.signerKey}")
-    private String jwtSignerKey;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         //cho pheps tất cả các end point /users đều truy cập được
         httpSecurity
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:5173"));
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
                 .authorizeHttpRequests(request ->
                     request
                             //tat ca endpoint nam trong public voi method POST thi public
@@ -52,7 +55,7 @@ public class SecurityConfig {
                     )
                 .oauth2ResourceServer(request ->
                     request
-                            .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+                            .jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
                     );
                 //xu ly logout
                 /*.logout(logout -> logout
@@ -67,16 +70,5 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-
-        SecretKeySpec secretKeySpec = new SecretKeySpec(jwtSignerKey.getBytes(), "HS512");
-
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    };
 
 }

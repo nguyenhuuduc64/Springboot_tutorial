@@ -1,0 +1,5 @@
+<mirror>
+    <id>my-mirror</id>
+    <mirrorOf>*</mirrorOf>
+    <url>https://my-company-repository.com/maven</url>
+</mirror>

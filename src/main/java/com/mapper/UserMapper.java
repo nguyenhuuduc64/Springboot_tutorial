@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     //tự động nhận request và trả về User
+    @Mapping(target = "roles", ignore = true)
     User toUser(UserCreationRequest request);
     //nhận vào 1 Object đã tồn tại và cập nhật lại nó với các field được map
     @Mapping(target = "roles", ignore = true)

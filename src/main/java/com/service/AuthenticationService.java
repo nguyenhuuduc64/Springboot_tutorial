@@ -1,9 +1,10 @@
 package com.service;
 
+import com.application.TokenVerifier;
+import com.client.OutboundIdentityClient;
+import com.client.OutboundUserClient;
 import com.dto.request.*;
-import com.dto.response.AuthenticationResponse;
-import com.dto.response.IntrospectResponse;
-import com.dto.response.RefreshResponse;
+import com.dto.response.*;
 import com.entity.InvalidatedToken;
 import com.entity.User;
 import com.exception.AppException;
@@ -15,10 +16,14 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.repository.InvalidatedTokenRepository;
 import com.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -26,6 +31,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -33,20 +40,35 @@ import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class AuthenticationService {
     UserRepository userRepository;
     InvalidatedTokenRepository  invalidatedTokenRepository;
-    private final JwtDecoder jwtDecoder;
+    private final OutboundUserClient outboundUserClient;
+    private final OutboundIdentityClient outboundIdentityClient;
+    @NonFinal
+    @Value("${outbound.identity.client-id}")
+    String CLIENT_ID;
+
+    @NonFinal
+    @Value("${outbound.identity.client-secret}")
+    String CLIENT_SECRET;
+
+    //@NonFinal
+    //@Value("${outbound.identity.redirect-uri}")
+    String REDIRECT_URI = "postmessage";
 
     //đánh dấu không inject vào contructor
     @NonFinal
     protected static final String SIGNER_KEY = "PgGjsdBtaJV6LVYM7VIsLjMVTVMZEunePgGjsdBtaJV6LVYM7VIsLjMVTVMZEune1234567890ABCDEF";
 
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
-        var user = userRepository.findByUsername(authenticationRequest.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+
+        var user = userRepository.findByEmail(authenticationRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -56,9 +78,53 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String token = this.generateToken(user);
+        String refreshToken = this.generateToken(user);
+
+        Cookie cookie = new Cookie("refresh_token", refreshToken);
+        cookie.setHttpOnly(true);   // Quan trọng: Chặn JavaScript truy cập
+        cookie.setSecure(false);    // Để true nếu dùng HTTPS
+        cookie.setPath("/");        // Áp dụng cho toàn bộ domain
+        cookie.setMaxAge(7 * 24 * 60 * 60); // Sống trong 7 ngày
+
+        assert response != null;
+        response.addCookie(cookie);
         boolean isAuthenticated = true;
         return new AuthenticationResponse(token, isAuthenticated);
     }
+
+
+    //ham xu ly login voi google
+    public AuthenticationResponse authenticateGoogle(String code) {
+        // Bước A: Đổi Code lấy AccessToken của Google
+        ExchangeTokenResponse response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType("authorization_code")
+                .build());
+
+        // Bước B: Dùng AccessToken đó để lấy thông tin User từ Google
+        OutboundUserResponse userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+
+        // Bước C: Tìm user trong DB, nếu không có thì đăng ký mới (Social Login)
+        var user = userRepository.findByEmail(userInfo.getEmail())
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .email(userInfo.getEmail())
+                        .username(userInfo.getEmail()) // Dùng email làm username
+                        .password("") // Password trống vì login qua Google
+                        .fullName(userInfo.getFamilyName())
+                        .build()));
+
+        // Bước D: Tạo JWT của riêng hệ thống mình trả về cho Frontend
+        String token = generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(token)
+                .isAuthenticated(true)
+                .build();
+    }
+
 
     public ApiResponse<Object> logout(LogoutRequest request) throws ParseException, JOSEException {
         var signedJwt = verifyToken(request.getToken());
@@ -120,7 +186,6 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
     }
-
     public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
 
 
@@ -135,24 +200,38 @@ public class AuthenticationService {
             boolean verified = signedJWT.verify(verifier);
 
             if (!verified | expiryTime.before(new Date())) throw new AppException(ErrorCode.TOKEN_EXPIRED);
-
+            log.info(signedJWT.getJWTClaimsSet().getJWTID());
             if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
                 throw new AppException(ErrorCode.UNAUTHENTICATED);
-
+            // kiem tra token co nam trong bang invalidatedToken hay khong
             return signedJWT;
 
     }
 
 
-
-    /*public RefreshResponse refreshToken(RefreshRequest request){
+    public RefreshResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
         var signJWT = verifyToken(request.getToken());
+        var jit = signJWT.getJWTClaimsSet().getJWTID();
+        var expireTime = signJWT.getJWTClaimsSet().getExpirationTime();
+        //vo hieu hoa token cu
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .expiryTime(expireTime)
+                .id(jit)
+                .build();
+        invalidatedTokenRepository.save(invalidatedToken);
 
-        var jit = signJWT.getId();
-        var expireTime = signJWT.getExpiresAt();
+        //tao token moi
+        //lay thong tin user
+        var userName = signJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findByUsername(userName).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        //tao token moi
+        var token = generateToken(user);
 
-
-    }*/
+        return RefreshResponse.builder()
+                .token(token)
+                .isAuthenticated(true)
+                .build();
+    }
 
     private String buildScope(User user){
         StringJoiner scopes =  new StringJoiner(" ");
@@ -164,4 +243,6 @@ public class AuthenticationService {
         return scopes.toString();
 
     }
+
+
 }
