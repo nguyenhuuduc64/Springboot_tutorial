@@ -33,7 +33,6 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
         try {
-            // 1. Kiểm tra Blacklist trực tiếp tại đây
             SignedJWT signedJWT = SignedJWT.parse(token);
             String jit = signedJWT.getJWTClaimsSet().getJWTID();
 
@@ -41,7 +40,6 @@ public class CustomJwtDecoder implements JwtDecoder {
                 throw new JwtException("Token invalidated");
             }
 
-            // 2. Khởi tạo và dùng nimbusJwtDecoder để verify chữ ký/hạn dùng
             if (Objects.isNull(nimbusJwtDecoder)) {
                 SecretKeySpec secretKeySpec = new SecretKeySpec(jwtSignerKey.getBytes(), "HS512");
                 nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)
@@ -51,7 +49,8 @@ public class CustomJwtDecoder implements JwtDecoder {
 
             return nimbusJwtDecoder.decode(token);
         } catch (Exception e) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            // Luôn trả về JwtException ở đây để Spring Security xử lý Context
+            throw new JwtException("Invalid token: " + e.getMessage());
         }
     }
 }

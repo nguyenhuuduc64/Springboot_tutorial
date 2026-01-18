@@ -28,7 +28,7 @@ public class SecurityConfig {
             "/auth/refresh",
             "/users",
             "/auth/log-in/google",
-            "/ai/analyze-tech"
+            "/ai/analyze-tech",
 
     };
 
@@ -50,6 +50,8 @@ public class SecurityConfig {
                     request
                             //tat ca endpoint nam trong public voi method POST thi public
                             .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                            .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
+
                             //.requestMatchers(HttpMethod.GET, "/users/**").hasAnyAuthority("SCOPE_ADMIN")
                             .anyRequest().authenticated()
                     )

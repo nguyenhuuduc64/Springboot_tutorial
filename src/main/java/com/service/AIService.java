@@ -1,6 +1,7 @@
 package com.service;
 
 import com.dto.request.AIRequest;
+import com.dto.response.AIResponse;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.ai.chat.client.ChatClient;
@@ -16,7 +17,9 @@ public class AIService {
         this.chatClient = chatClientBuilder.build();
     }
 
-    public String analyzeTech(AIRequest aiRequest) throws ParseException {
-        return chatClient.prompt(aiRequest.getMessage()).call().content();
+    public AIResponse analyzeTech(AIRequest aiRequest) throws ParseException {
+        return AIResponse.builder()
+                .responseMessage(chatClient.prompt(aiRequest.getMessage()).call().content())
+                .build();
     }
 }

@@ -146,6 +146,7 @@ public class AuthenticationService {
     }
 
     public IntrospectResponse introspect(IntrospectRequest request) {
+        System.out.println(request.getToken());
         String token = request.getToken();
         try {
             SignedJWT signJwt = verifyToken(token);

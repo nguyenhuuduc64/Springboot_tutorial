@@ -25,4 +25,7 @@ public class User {
     String email;
     @ManyToMany
     Set<Role> roles; //trong 1 mang role chi co 1 role la duy nhat, khong bi trung
+
+    @OneToMany
+    List<CV> cvs;
 }

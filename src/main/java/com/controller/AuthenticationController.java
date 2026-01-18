@@ -56,6 +56,7 @@ public class AuthenticationController {
     }
     @PostMapping("/introspect")
     ApiResponse <IntrospectResponse> authenticate(@RequestBody IntrospectRequest introspectRequest){
+        System.out.println(introspectRequest.toString());
         IntrospectResponse result = authenticationService.introspect(introspectRequest);
 
         return ApiResponse.<IntrospectResponse>builder()
@@ -73,6 +74,4 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
-
-
 }
