@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RecruiterRegistrationResponse {
-
+    String id;
     String businessLicenseUrl;
     RequestStatus status;
 

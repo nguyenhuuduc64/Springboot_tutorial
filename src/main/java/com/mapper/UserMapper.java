@@ -1,8 +1,6 @@
 package com.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 import com.dto.request.UserUpdateRequest;
 import com.dto.request.UserCreationRequest;
@@ -17,8 +15,9 @@ public interface UserMapper {
     User toUser(UserCreationRequest request);
     //nhận vào 1 Object đã tồn tại và cập nhật lại nó với các field được map
     @Mapping(target = "roles", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
 
-
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     UserResponse toUserResponse(User user);
 }

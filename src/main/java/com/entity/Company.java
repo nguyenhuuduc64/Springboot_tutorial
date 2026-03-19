@@ -33,7 +33,7 @@ public class Company {
 
     @Column(columnDefinition = "TEXT")
     String description; // Mô tả ngắn gọn
-
+    String logoUrl;
 
     // --- MỐI QUAN HỆ ---
     @OneToOne

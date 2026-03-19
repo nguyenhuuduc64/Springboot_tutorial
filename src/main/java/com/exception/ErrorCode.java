@@ -19,6 +19,10 @@ public enum ErrorCode {
     INVALID_EMAIL(4004, "Invalid email format", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(4005, "Password does not meet requirements", HttpStatus.BAD_REQUEST),
 
+    //company errors
+    COMPANY_NOT_FOUND(4041, "User not found", HttpStatus.NOT_FOUND),
+
+
     // Resource Errors (4xx)
     RESOURCE_NOT_FOUND(4040, "Resource not found", HttpStatus.NOT_FOUND),
     RESOURCE_ALREADY_EXISTS(4090, "Resource already exists", HttpStatus.CONFLICT),

@@ -102,11 +102,22 @@ public class UserService {
     public UserResponse updateUser(String id, UserUpdateRequest userUpdate) {
         User user = getUserEntityById(id);
         userMapper.updateUser(user, userUpdate);
-        Role role = roleRepository.findById(userUpdate.getRoles().toString())
-                .orElseThrow(() -> new RuntimeException("Role not found: " + userUpdate.getRoles()));
-        //do JPA tra ve List can converse sang Set cua User
-        user.setRoles(role);
-        return userMapper.toUserResponse(userRepository.save(user));
+
+        if (userUpdate.getRoles() != null && !userUpdate.getRoles().isEmpty()) {
+            // 1. Lấy ra String tên role từ Set gửi lên
+            String roleName = userUpdate.getRoles().iterator().next();
+
+            // 2. Tìm đối tượng Role thực sự trong DB
+            Role role = roleRepository.findById(roleName)
+                    .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+
+            // 3. Gán TRỰC TIẾP đối tượng role vào user (Vì Entity là Single Object)
+            // KHÔNG dùng Set.of() ở đây nữa thưa ông chủ!
+            user.setRoles(role);
+        }
+
+        User savedUser = userRepository.save(user);
+        return userMapper.toUserResponse(savedUser);
     }
     @Transactional
     public void deleteUser(String id) {

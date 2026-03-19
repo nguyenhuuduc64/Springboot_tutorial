@@ -36,6 +36,15 @@ spring:
     jackson:
       serialization:
         fail-on-empty-beans: false
+
+  autoconfigure:
+    exclude:
+      - com.google.cloud.spring.autoconfigure.datastore.GcpDatastoreAutoConfiguration
+      - com.google.cloud.spring.autoconfigure.datastore.health.DatastoreHealthIndicatorAutoConfiguration
+management:
+  health:
+    datastore:
+      enabled: false
 jwt:
   signerKey: ${SIGNER_KEY}
 outbound:
