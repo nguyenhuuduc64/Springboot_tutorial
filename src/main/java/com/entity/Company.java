@@ -1,9 +1,11 @@
 package com.entity;
 
+import com.utils.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -25,7 +27,9 @@ public class Company {
     String email;
     String phoneNumber;
     String websiteUrl;
-    String address;
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = StringListConverter.class)
+    List<String> address;
 
     // --- THÊM CÁC TRƯỜNG VỀ THƯƠNG HIỆU ---
     String logo; // Lưu URL ảnh logo

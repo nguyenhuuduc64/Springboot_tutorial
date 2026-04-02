@@ -50,7 +50,7 @@ public class CustomJwtDecoder implements JwtDecoder {
             return nimbusJwtDecoder.decode(token);
         } catch (Exception e) {
             // Luôn trả về JwtException ở đây để Spring Security xử lý Context
-            throw new JwtException("Invalid token: " + e.getMessage());
+            throw new org.springframework.security.oauth2.jwt.BadJwtException("Jwt expired or invalid", e);
         }
     }
 }

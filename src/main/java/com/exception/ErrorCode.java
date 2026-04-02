@@ -9,7 +9,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(401, "User is not authenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(403, "User does not have permission", HttpStatus.FORBIDDEN),
     INVALID_CREDENTIALS(4001, "Invalid username or password", HttpStatus.BAD_REQUEST),
-    TOKEN_EXPIRED(4002, "Token has expired", HttpStatus.UNAUTHORIZED),
+    TOKEN_EXPIRED(401, "Token has expired", HttpStatus.UNAUTHORIZED),
     TOKEN_INVALID(4003, "Token is invalid", HttpStatus.UNAUTHORIZED),
 
     // User Errors (4xx)

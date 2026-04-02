@@ -37,12 +37,21 @@ public class CompanyController {
                 .build();
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ApiResponse<CompanyResponse> getCompanyByUserId(@PathVariable("userId") String userId){
         return ApiResponse.<CompanyResponse>builder()
                 .code(200)
                 .message("get company by user id successfully")
                 .result(companyService.getCompanyByUserId(userId))
+                .build();
+    }
+
+    @GetMapping("/{companyId}")
+    public ApiResponse<CompanyResponse> getCompanyByCompanyId(@PathVariable("companyId") String companyId){
+        return ApiResponse.<CompanyResponse>builder()
+                .code(200)
+                .message("get company by company id successfully")
+                .result(companyService.getCompanyByCompanyId(companyId))
                 .build();
     }
 

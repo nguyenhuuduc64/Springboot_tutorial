@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class CompanyRequest {
@@ -18,7 +20,7 @@ public class CompanyRequest {
     String email;
     String phoneNumber;
     String websiteUrl;
-    String address;
+    List<String> address;
 
     // --- THÊM CÁC TRƯỜNG VỀ THƯƠNG HIỆU ---
     String logo; // Lưu URL ảnh logo

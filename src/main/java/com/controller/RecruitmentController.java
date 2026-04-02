@@ -9,10 +9,12 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/recruitment")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -39,6 +41,7 @@ public class RecruitmentController {
 
     @PostMapping("")
     public ApiResponse<RecruitmentResponse> create(@RequestBody RecruitmentRequest request){
+        log.info("recruitment request cotroller: {}", request);
         return ApiResponse.<RecruitmentResponse>builder()
                 .message("Create recruitment successfully")
                 .code(200)

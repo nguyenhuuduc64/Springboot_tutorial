@@ -9,6 +9,7 @@ import com.entity.Recruitment;
 import com.entity.User;
 import com.exception.AppException;
 import com.exception.ErrorCode;
+import com.mapper.CompanyMapper;
 import com.mapper.RecruitmentMapper;
 import com.repository.CompanyRepository;
 import com.repository.JobCategoryRepository;
@@ -22,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -33,6 +35,7 @@ public class RecruitmentService {
     UserRepository userRepository;
     CompanyRepository companyRepository;
     JobCategoryRepository jobCategoryRepository;
+    CompanyMapper  companyMapper;
     public  List<RecruitmentResponse> getAll(){
         return recruitmentRepository.findAll().stream().map(
                 recruitmentMapper::toRecruitmentResponse
@@ -46,6 +49,9 @@ public class RecruitmentService {
     }
 
     public RecruitmentResponse create(RecruitmentRequest request){
+
+        log.info("recruitment request: {}", request);
+
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -58,13 +64,24 @@ public class RecruitmentService {
 
 
         Recruitment recruitment = recruitmentMapper.toRecruitment(request);
+        log.info("entity chuan bi luu: {}", recruitment);
+        if (request.getRequirements() != null) {
+            List<String> cleanRequirements = request.getRequirements().stream()
+                    .filter(Objects::nonNull) // Loại bỏ phần tử null thưa ông chủ
+                    .map(String::trim)        // Xóa khoảng trắng thừa
+                    .filter(s -> !s.isEmpty()) // Loại bỏ chuỗi rỗng
+                    .toList();
+            recruitment.setRequirements(cleanRequirements);
+        }
 
         recruitment.setCompany(company);
         recruitment.setCategory(jobCategory);
 
         log.info("thong tin tuyen dung: {}" , recruitment);
         Recruitment response = recruitmentRepository.save(recruitment);
-        return recruitmentMapper.toRecruitmentResponse(response);
+        RecruitmentResponse recruitmentResponse = recruitmentMapper.toRecruitmentResponse(response);
+        recruitmentResponse.setCompany(companyMapper.toCompanyResponse(recruitment.getCompany()));
+        return recruitmentResponse;
     }
 
 

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor  // THÊM DÒNG NÀY THƯA ÔNG CHỦ
@@ -21,7 +23,8 @@ public class CompanyResponse {
     String email;
     String phoneNumber;
     String websiteUrl;
-    String address;
+    List<String> address;
+
 
     // --- THÊM CÁC TRƯỜNG VỀ THƯƠNG HIỆU ---
     String logo; // Lưu URL ảnh logo

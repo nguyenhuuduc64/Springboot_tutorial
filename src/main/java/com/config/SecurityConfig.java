@@ -53,27 +53,16 @@ public class SecurityConfig {
                     return config;
                 }))
                 .authorizeHttpRequests(request ->
-                    request
-                            //tat ca endpoint nam trong public voi method POST thi public
-                            .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
-                            .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
-                            .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINT).permitAll()
-                            .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINT).permitAll()
-
-                            //.requestMatchers(HttpMethod.GET, "/users/**").hasAnyAuthority("SCOPE_ADMIN")
-                            .anyRequest().authenticated()
-                    )
-                .oauth2ResourceServer(request ->
-                    request
-                            .jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
-                    );
-                //xu ly logout
-                /*.logout(logout -> logout
-                        .logoutUrl("/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                        }
-                )*/
+                        request
+                                .requestMatchers(PUBLIC_ENDPOINT).permitAll() // Cho phép tất cả thưa ông chủ
+                                .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINT).permitAll()
+                                .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(customJwtDecoder))
+                        // QUAN TRỌNG: Thêm cái này để Spring không chặn request khi token lỗi thưa ông chủ
+                        .authenticationEntryPoint(new org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint())
+                );
 
         //tắt cross origin
         httpSecurity.csrf(AbstractHttpConfigurer::disable);

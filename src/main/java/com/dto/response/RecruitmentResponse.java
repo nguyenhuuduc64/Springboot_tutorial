@@ -7,6 +7,9 @@ import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
@@ -24,5 +27,24 @@ public class RecruitmentResponse {
     String content;
 
     String salary;
+
+    List<String> requirements;
+
+    List<String> benefits;
+    List<String> technologies;
+
+    String workingDay;
+
+    String workingTime;
+
+    String expirationDate;
+
+    String education;
+
+    String level;
+
+    List<String> workingAt;
+
+    CompanyResponse company;
 
 }

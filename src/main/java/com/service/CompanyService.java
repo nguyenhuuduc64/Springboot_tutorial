@@ -52,4 +52,13 @@ public class CompanyService {
         log.info("day la thong tin company {}", companyMapper.toCompanyResponse(company));
         return companyMapper.toCompanyResponse(company);
     }
+
+    public CompanyResponse getCompanyByCompanyId(String companyId){
+        // Tìm trực tiếp trong bảng Company luôn cho nhanh thưa ông chủ
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new AppException(ErrorCode.COMPANY_NOT_FOUND));
+        return companyMapper.toCompanyResponse(company);
+    }
+
+
 }
