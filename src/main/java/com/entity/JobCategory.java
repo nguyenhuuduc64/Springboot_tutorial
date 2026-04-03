@@ -26,9 +26,6 @@ public class JobCategory {
 
     String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    List<Recruitment> recruitments;
-
     @CreatedDate // Tự động lấy ngày giờ khi insert
     @Column(updatable = false) // Đảm bảo không bị sửa khi update ngành nghề
     LocalDateTime createdAt;

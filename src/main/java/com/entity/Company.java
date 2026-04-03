@@ -1,5 +1,6 @@
 package com.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.utils.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +42,7 @@ public class Company {
 
     // --- MỐI QUAN HỆ ---
     @OneToOne
-    @JoinColumn(name = "user_id", unique = true) // Nên chỉ định rõ tên cột khóa ngoại
+    @JoinColumn(name = "user_id", unique = true)
+    @JsonIgnore
             User user;
 }

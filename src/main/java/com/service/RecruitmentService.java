@@ -19,6 +19,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -42,10 +46,22 @@ public class RecruitmentService {
         ).toList();
     }
 
+    public Page<Recruitment> getAllRecruitments(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
+        return recruitmentRepository.findAll(pageable);
+    }
+
     public  RecruitmentResponse getRecruitment(String id){
         Recruitment recruitment = recruitmentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.RECRUITMENT_NOT_FOUND));
         return recruitmentMapper.toRecruitmentResponse(recruitment);
+    }
+
+    public  List<RecruitmentResponse> getRecruitmentByCompanyId(String companyId){
+        List<RecruitmentResponse> recruitments = recruitmentRepository.findByCompanyId(companyId)
+                .stream().map(recruitment -> recruitmentMapper.toRecruitmentResponse(recruitment))
+                .toList();
+        return recruitments;
     }
 
     public RecruitmentResponse create(RecruitmentRequest request){
@@ -84,6 +100,9 @@ public class RecruitmentService {
         return recruitmentResponse;
     }
 
-
+    public String delete(String recruitmentId){
+        recruitmentRepository.deleteById(recruitmentId);
+        return "recruitment has been deleted";
+    }
 
 }
