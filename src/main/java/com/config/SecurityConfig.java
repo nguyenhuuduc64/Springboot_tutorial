@@ -46,7 +46,7 @@ public class SecurityConfig {
         httpSecurity
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173", "https://openedx.id.vn", "https://seeking-job-and-cv-generator-platform-hoh9nf98q.vercel.app/"));
+                    config.setAllowedOrigins(List.of("http://localhost:5173", "https://openedx.id.vn", "https://seeking-job-and-cv-generator-platfo.vercel.app"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
