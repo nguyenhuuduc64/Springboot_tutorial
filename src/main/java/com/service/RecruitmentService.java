@@ -105,4 +105,12 @@ public class RecruitmentService {
         return "recruitment has been deleted";
     }
 
+    public RecruitmentResponse update(String recruitmentId, RecruitmentRequest request) {
+        Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
+                .orElseThrow(() -> new AppException(ErrorCode.RECRUITMENT_NOT_FOUND));
+
+        recruitmentMapper.updateRecruitment(recruitment, request);
+
+        return recruitmentMapper.toRecruitmentResponse(recruitmentRepository.save(recruitment));
+    }
 }

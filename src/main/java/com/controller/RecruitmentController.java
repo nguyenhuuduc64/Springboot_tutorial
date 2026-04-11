@@ -77,4 +77,13 @@ public class RecruitmentController {
         return recruitmentService.delete(recruitmentId);
     }
 
+    @PutMapping("/{recruitmentId}")
+    public ApiResponse<RecruitmentResponse> update(@PathVariable String recruitmentId, @RequestBody RecruitmentRequest request){
+        return ApiResponse.<RecruitmentResponse>builder()
+                .message("update recruitment successfully")
+                .code(200)
+                .result(recruitmentService.update(recruitmentId, request))
+                .build();
+    }
+
 }

@@ -90,7 +90,6 @@ public class CVService {
         } else {
             CV cv = cvRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy CV"));
-            System.out.print("da tim thay cv");
             cv.setContent(cvRequest.getContent());
             return cvMapper.toCVResponse(cvRepository.save(cv));
         }

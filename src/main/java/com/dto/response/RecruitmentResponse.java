@@ -18,8 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 public class RecruitmentResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
     String title;

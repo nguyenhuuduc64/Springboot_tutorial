@@ -35,7 +35,6 @@ public class UserController {
     private final UserService userService;
     @PostMapping("")
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
-        System.out.println("tao user");
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("success");
         apiResponse.setResult(userService.createUser(request));

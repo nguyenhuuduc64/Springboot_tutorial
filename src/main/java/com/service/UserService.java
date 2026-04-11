@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.entity.LikeStore;
 import com.entity.Role;
 import com.exception.AppException;
 import com.exception.ErrorCode;
+import com.repository.LikeStoreRepository;
 import com.repository.RoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -38,12 +40,15 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository  roleRepository;
+    private final LikeStoreService likeStoreService;
+    private final LikeStoreRepository likeStoreRepository;
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByUsername(request.getUsername()))
             throw new RuntimeException("User existed");
 
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
 
         Role finalRole;
 
@@ -56,7 +61,13 @@ public class UserService {
         }
 
         user.setRoles(finalRole);
-        System.out.println("user truoc khi luu" + user);
+
+        LikeStore likeStore = LikeStore.builder().build();
+
+        likeStore.setUser(user);
+
+        likeStoreRepository.save(likeStore);
+
         user = userRepository.save(user);
 
         return userMapper.toUserResponse(user);
