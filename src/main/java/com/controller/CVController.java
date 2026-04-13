@@ -84,4 +84,13 @@ public class CVController {
                 .result(result)
                 .build();
     }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse deleteCV(@PathVariable String id){
+        cvService.deleteCV(id);
+        return ApiResponse.builder()
+                .code(200)
+                .message("delete cv successfully")
+                .build();
+    }
 }

@@ -61,6 +61,7 @@ public class UserService {
         }
 
         user.setRoles(finalRole);
+        user = userRepository.save(user);
 
         LikeStore likeStore = LikeStore.builder().build();
 
@@ -68,7 +69,6 @@ public class UserService {
 
         likeStoreRepository.save(likeStore);
 
-        user = userRepository.save(user);
 
         return userMapper.toUserResponse(user);
     }

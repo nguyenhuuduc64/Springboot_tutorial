@@ -95,4 +95,8 @@ public class CVService {
         }
     }
 
+    public void deleteCV(String id){
+        cvRepository.deleteById(id);
+    }
+
 }
