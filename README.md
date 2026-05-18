@@ -1,35 +1,53 @@
-# Viecs - Online Recruitment Platform (Frontend)
+# Viecs - Online Recruitment Platform (Backend API)
 
-Hệ thống nền tảng tuyển dụng trực tuyến kết nối nhà tuyển dụng và ứng viên, tích hợp các công cụ tối ưu trải nghiệm như tạo CV tương tác thời gian thực, quét dữ liệu tự động (OCR) và quản lý quy trình ứng tuyển thông minh.
+Hệ thống API phục vụ nền tảng tuyển dụng trực tuyến, chịu trách nhiệm xử lý logic nghiệp vụ, phân quyền bảo mật cao cấp, lưu trữ đám mây, tích hợp các dịch vụ AI giải mã dữ liệu văn bản và tự động hóa quy trình phân tích hồ sơ ứng viên.
 
 ## 🚀 Tính năng cốt lõi
 
-- **Hệ thống xác thực bảo mật:** Tích hợp đăng nhập tập trung mã nguồn mở, bảo mật phiên làm việc và phân quyền luồng User/Recruiter.
-- **Trình tạo CV tương tác thời gian thực (Dynamic CV Builder):** Hỗ trợ xuất định dạng tài liệu, xử lý chuyển đổi dữ liệu hiển thị trực quan sang tệp cứng (`html-to-image`, `html2canvas`, `html2pdf.js`).
-- **Trình soạn thảo văn bản nâng cao (Rich Text Editor):** Tích hợp hệ thống Tiptap và CKEditor 5 hỗ trợ đăng tin tuyển dụng, viết mô tả công việc và quản lý profile chuyên nghiệp.
-- **Đa ngôn ngữ toàn diện:** Sử dụng giải pháp dịch thuật tự động `i18n` và hệ thống tự động nhận diện ngôn ngữ trình duyệt của người dùng.
-- **Hệ thống UI Component phẳng và tối giản:** Xây dựng trên nền tảng Tailwind CSS, Radix UI Primitives, đem lại khả năng tương thích khả dụng (Accessibility) và hiệu ứng chuyển động mượt mà.
-- **Quản lý trạng thái & Cache:** Sử dụng TanStack Query (React Query) kết hợp Redux Toolkit tối ưu hóa hiệu năng tải dữ liệu, giảm thiểu tối đa số lượng request trùng lặp lên máy chủ.
+- **Kiến trúc RESTful API chuẩn:** Xây dựng trên nền tảng Spring Boot 3.2.5 (Java 17), tối ưu hóa cấu trúc phân tầng và tăng tốc biên dịch.
+- **Bảo mật OAuth2 Resource Server:** Tích hợp `spring-boot-starter-oauth2-resource-server` và `nimbus-jose-jwt` xử lý mã hóa, giải mã định danh JWT, bảo mật luồng dữ liệu truyền tải giữa FE và BE.
+- **Tích hợp Trí tuệ nhân tạo (Spring AI):** Sử dụng `spring-ai-openai-spring-boot-starter` hỗ trợ phân tích thông tin tuyển dụng và đề xuất công việc thông minh.
+- **Trích xuất dữ liệu thông minh (OCR):** Tích hợp `google-cloud-vision` tự động quét, đọc và bóc tách dữ liệu từ các file CV định dạng ảnh hoặc tài liệu PDF của ứng viên sang dữ liệu thô.
+- **Ánh xạ dữ liệu tối ưu (Data Mapping):** Sử dụng `mapstruct` để chuyển đổi tự động và hiệu năng cao giữa hệ Entity dữ liệu (`spring-boot-starter-data-jpa`) và các đối tượng truyền tải DTO.
+- **Giám sát hệ thống:** Tích hợp `spring-boot-starter-actuator` cung cấp các endpoint kiểm tra trạng thái sức khỏe (Healthcheck) và hiệu năng vận hành của ứng dụng.
 
-## 📁 Thư viện công nghệ chính (Tech Stack)
+## 📁 Thư viện công nghệ chính (Tech Stack & Dependencies)
 
-Hệ thống được phát triển dựa trên các thư viện cốt lõi quy định trong `package.json`:
+Chi tiết hệ thống thư viện lõi khai báo trong `pom.xml`:
 
-| Phân nhóm | Thư viện sử dụng |
+| Nhóm chức năng | Thư viện / Artifact sử dụng |
 | :--- | :--- |
-| **Framework & Core** | React 18+, TypeScript, Vite |
-| **State Management** | `@reduxjs/toolkit`, `@tanstack/react-query` |
-| **UI Primitives** | Radix UI (`@radix-ui/react-dialog`, `accordion`, `dropdown-menu`, etc.) |
-| **Styling & Icons** | `tailwind-css`, `lucide-react`, `fortawesome` |
-| **Editor** | `@tiptap/core` (& extensions), `ckeditor5` |
-| **Media Handling** | `@cloudinary/react` (Tối ưu hóa và quản lý lưu trữ hình ảnh) |
-| **Data Table & Form**| `@tanstack/react-table`, `axios` |
-| **Internationalization**| `i18next`, `i18next-browser-languagedetector` |
+| **Framework Core** | Spring Boot 3.2.5, Spring Web, Spring Boot DevTools |
+| **Bảo mật / Auth** | Spring Security Crypto, OAuth2 Resource Server, Nimbus JOSE JWT |
+| **Trí tuệ nhân tạo** | Spring AI OpenAI Starter, Google Cloud Vision |
+| **Dữ liệu & Lưu trữ**| Spring Data JPA, MySQL Connector-J, Google Cloud Datastore |
+| **Microservices** | Spring Cloud Starter OpenFeign (Hỗ trợ gọi API ngoài) |
+| **Tiện ích biên dịch**| Lombok 1.18.30, MapStruct 1.5.5.Final, Validation |
 
 ## 🛠️ Hướng dẫn cài đặt và chạy ứng dụng
 
 ### 1. Tải mã nguồn về máy cục bộ
 ```bash
-git clone [https://github.com/nguyenhuuduc64/viecs-react-FE.git](https://github.com/nguyenhuuduc64/viecs-react-FE.git)
-cd viecs-react-FE
- 
+git clone [https://github.com/nguyenhuuduc64/viecs-springboot-BE.git](https://github.com/nguyenhuuduc64/viecs-springboot-BE.git)
+cd viecs-springboot-BE
+
+ Tạo hoặc cập nhật cấu hình kết nối cơ sở dữ liệu và API Key:
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/viecs_db?useSSL=false&serverTimezone=UTC
+    username: your_db_username
+    password: your_db_password
+  ai:
+    openai:
+      api-key: your_openai_api_key
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: your_auth_issuer_uri
+# Cài đặt thư viện và biên dịch mã nguồn
+./mvnw clean install
+
+# Khởi chạy ứng dụng
+./mvnw spring-boot:run
+
